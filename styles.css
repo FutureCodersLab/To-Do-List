@@ -1,0 +1,189 @@
+@import url("https://fonts.googleapis.com/css?family=Poppins");
+
+:root {
+    --font-family: "Poppins", sans-serif;
+    --background: #f4f6fc;
+    --secondary-background: white;
+    --blue: #7096d1;
+    --black: #1f1f21;
+    --green: #81a969;
+    --red: #cf352e;
+    --progress: #334eac;
+}
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: var(--background);
+    font-family: var(--font-family);
+    color: white;
+}
+#container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 30px;
+    width: "100%";
+    overflow: hidden;
+}
+header {
+    background-color: var(--blue);
+    width: 100%;
+    padding: 30px;
+    gap: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    width: 50%;
+    min-width: 350px;
+}
+.main-header h1 {
+    font-size: 30px;
+    margin: 0;
+}
+#progress-bar {
+    min-width: 350px;
+    width: 50%;
+    height: 10px;
+    background-color: var(--secondary-background);
+    border-radius: 5px;
+    margin-top: 20px;
+}
+#progress {
+    width: 0%;
+    height: 10px;
+    background: var(--progress);
+    border-radius: 10px;
+    transition: 1s ease all;
+}
+#task-summary {
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--blue);
+}
+form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    width: 50%;
+    min-width: 350px;
+}
+#input-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+#input {
+    flex: 1;
+    padding: 16px;
+    background-color: var(--secondary-background);
+    border: 1px solid var(--blue);
+    border-radius: 10px;
+    color: var(--black);
+    outline: none;
+}
+#input::placeholder {
+    color: var(--blue);
+    opacity: 0.5;
+}
+#microphone {
+    position: absolute;
+    top: 0;
+    right: 20px;
+    transform: translateY(50%);
+    color: var(--blue);
+    cursor: pointer;
+}
+form button {
+    all: unset;
+    padding: 12.5px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--blue);
+    color: white;
+    cursor: pointer;
+}
+.input-icon {
+    font-size: 25px;
+}
+.task-icon {
+    pointer-events: none;
+}
+#task-list {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 50%;
+    min-width: 350px;
+    list-style: none;
+}
+.task {
+    width: calc(100% - 20px);
+    display: flex;
+    background-color: var(--secondary-background);
+    padding: 10px;
+    border-radius: 10px;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--black);
+    border: 2px solid transparent;
+    transition: 0.3s ease border;
+}
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.checkbox-container input {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+.checkbox-container input:checked {
+    background-color: var(--blue);
+}
+.task label {
+    cursor: pointer;
+}
+.task.completed label {
+    text-decoration: line-through;
+}
+.task.editing {
+    border: 2px solid var(--blue);
+}
+.task .actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+.task button {
+    all: unset;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+.task .delete {
+    color: var(--red);
+}

@@ -169,10 +169,10 @@ recognition.maxAlternatives = 1;
 recognition.addEventListener("result", (event) => {
     const speechToText = event.results[0][0].transcript;
     input.value = speechToText;
-    if (speechToText.split(" ").includes("add")) {
-        input.value = speechToText.replace("add", "").trim();
-        addTask();
-    }
+    // if (speechToText.split(" ").includes("add")) {
+    //     input.value = speechToText.replace("add", "").trim();
+    //     addTask();
+    // }
 });
 
 recognition.addEventListener("end", () => {

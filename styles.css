@@ -144,7 +144,7 @@ form button {
 .task {
     width: calc(100% - 20px);
     display: flex;
-    background-color: var(--white);
+    background-color: white;
     padding: 10px;
     border-radius: 10px;
     justify-content: space-between;

@@ -1,7 +1,7 @@
 import { addIcon, editIcon, editSquareIcon, deleteIcon } from "./icons.js";
 
 let tasks = [];
-let editIndex;
+let editIndex = null;
 
 const input = document.getElementById("input");
 const addTaskButton = document.getElementById("add-task");
@@ -98,7 +98,7 @@ const updateTaskList = () => {
         const actions = createActionsContainer(index);
 
         li.appendChild(checkboxContainer);
-        li.append(actions);
+        li.appendChild(actions);
 
         taskList.appendChild(li);
     });
@@ -177,8 +177,10 @@ recognition.addEventListener("result", (event) => {
 
 recognition.addEventListener("end", () => {
     recognition.stop();
+    input.classList.remove("active");
 });
 
 microphone.addEventListener("click", () => {
     recognition.start();
+    input.classList.add("active");
 });

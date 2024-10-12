@@ -1,4 +1,5 @@
-import { addIcon, editIcon, editSquareIcon, deleteIcon } from "./icons.js";
+import { createElementWithAttributes } from "./helpers.js";
+import { addIcon, deleteIcon, editIcon, editSquareIcon } from "./icons.js";
 
 let tasks = [];
 let editIndex = null;
@@ -6,26 +7,40 @@ let editIndex = null;
 const input = document.getElementById("input");
 const addTaskButton = document.getElementById("add-task");
 const taskList = document.getElementById("task-list");
+const microphone = document.getElementById("microphone");
 
 document.addEventListener("DOMContentLoaded", () => {
     const storedTasks = JSON.parse(localStorage.getItem("tasks"));
+
     if (storedTasks) {
         tasks = storedTasks;
         updateTaskList();
         updateStats();
     }
-});
 
-const createElementWithAttributes = (tag, attributes) => {
-    const element = document.createElement(tag);
-    Object.entries(attributes).forEach(([key, value]) => {
-        element[key] = value;
+    addTaskButton.addEventListener("click", addTask);
+
+    const recognition = setUpSpeechRecognition();
+
+    microphone.addEventListener("click", () => {
+        recognition.start();
+        input.classList.add("active");
     });
-    return element;
-};
+
+    recognition.addEventListener("end", () => {
+        recognition.stop();
+        input.classList.remove("active");
+    });
+
+    recognition.addEventListener("result", (e) => {
+        const speechToText = e.results[0][0].transcript;
+        input.value = speechToText;
+    });
+});
 
 const addTask = () => {
     const text = input.value.trim();
+
     if (!text) return;
 
     if (editIndex !== null) {
@@ -35,37 +50,23 @@ const addTask = () => {
             task.classList.remove("editing")
         );
     } else {
-        tasks.push({ text, completed: false });
+        tasks.push({ text, isComplete: false });
     }
 
     addTaskButton.innerHTML = addIcon;
     input.value = "";
+
     updateTaskList();
     updateStats();
     saveTasks();
 };
-const toggleTaskComplete = (index) => {
-    tasks[index].completed = !tasks[index].completed;
-    updateTaskList();
-    updateStats();
-    saveTasks();
-};
-const updateStats = () => {
-    const taskSummary = document.getElementById("task-summary");
-    const progressBar = document.getElementById("progress");
 
-    const totalCompletedTasks = tasks.filter((task) => task.completed).length;
-    const totalTasks = tasks.length;
-    const progress = (totalCompletedTasks / totalTasks) * 100;
+const toggleTaskCompleted = (index, target) => {
+    tasks[index].isComplete = !tasks[index].isComplete;
 
-    progressBar.style.width = `${progress}%`;
+    const task = target.parentElement.parentElement;
+    task.classList.toggle("completed");
 
-    taskSummary.innerText = `${totalCompletedTasks} / ${totalTasks}`;
-};
-
-const deleteTask = (index) => {
-    tasks.splice(index, 1);
-    updateTaskList();
     updateStats();
     saveTasks();
 };
@@ -74,11 +75,19 @@ const editTask = (index, target) => {
     Array.from(taskList.children).forEach((task) =>
         task.classList.remove("editing")
     );
+
     const task = target.parentElement.parentElement;
     task.classList.add("editing");
     input.value = tasks[index].text;
     editIndex = index;
     addTaskButton.innerHTML = editIcon;
+};
+
+const deleteTask = (index) => {
+    tasks.splice(index, 1);
+    updateTaskList();
+    updateStats();
+    saveTasks();
 };
 
 const saveTasks = () => {
@@ -90,7 +99,7 @@ const updateTaskList = () => {
 
     tasks.forEach((task, index) => {
         const li = createElementWithAttributes("li", {
-            className: `task ${task.completed ? "completed" : ""}`,
+            className: `task ${task.isComplete ? "completed" : ""}`,
         });
 
         const checkboxContainer = createCheckboxContainer(task, index);
@@ -115,14 +124,17 @@ const createCheckboxContainer = (task, index) => {
         type: "checkbox",
         className: "checkbox",
         id: checkboxId,
-        checked: task.completed,
+        checked: task.isComplete,
     });
+
+    checkbox.addEventListener("change", (e) =>
+        toggleTaskCompleted(index, e.target)
+    );
+
     const label = createElementWithAttributes("label", {
         htmlFor: checkboxId,
         textContent: task.text,
     });
-
-    checkbox.addEventListener("change", () => toggleTaskComplete(index));
 
     checkboxContainer.appendChild(checkbox);
     checkboxContainer.appendChild(label);
@@ -138,12 +150,14 @@ const createActionsContainer = (index) => {
     const editButton = createElementWithAttributes("button", {
         innerHTML: editSquareIcon,
     });
+
     editButton.addEventListener("click", (e) => editTask(index, e.target));
 
     const deleteButton = createElementWithAttributes("button", {
         className: "delete",
         innerHTML: deleteIcon,
     });
+
     deleteButton.addEventListener("click", () => deleteTask(index));
 
     actions.appendChild(editButton);
@@ -152,35 +166,32 @@ const createActionsContainer = (index) => {
     return actions;
 };
 
-addTaskButton.addEventListener("click", addTask);
+const updateStats = () => {
+    const taskSummary = document.getElementById("task-summary");
+    const progress = document.getElementById("progress");
 
-const microphone = document.getElementById("microphone");
+    const totalCompletedTasks = tasks.filter((task) => task.isComplete).length;
+    const totalTasks = tasks.length;
+    const completionPercentage = (totalCompletedTasks / totalTasks) * 100;
 
-const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
+    progress.style.width = `${completionPercentage}%`;
 
-const recognition = new SpeechRecognition();
-recognition.lang = "en-US";
-// recognition.lang = "es-ES";
-// recognition.lang = "mn-MN";
-recognition.interimResults = false;
-recognition.maxAlternatives = 1;
+    taskSummary.textContent = `${totalCompletedTasks} / ${totalTasks}`;
+};
 
-recognition.addEventListener("result", (event) => {
-    const speechToText = event.results[0][0].transcript;
-    input.value = speechToText;
-    // if (speechToText.split(" ").includes("add")) {
-    //     input.value = speechToText.replace("add", "").trim();
-    //     addTask();
-    // }
-});
+const setUpSpeechRecognition = () => {
+    const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
 
-recognition.addEventListener("end", () => {
-    recognition.stop();
-    input.classList.remove("active");
-});
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    // recognition.lang = "es-ES";
+    // recognition.lang = "mn-MN";
+    // recognition.lang = "ru-RU";
+    // recognition.lang = "ky-KG";
+    // recognition.lang = "zh-TW";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
-microphone.addEventListener("click", () => {
-    recognition.start();
-    input.classList.add("active");
-});
+    return recognition;
+};

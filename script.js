@@ -1,5 +1,5 @@
-import { createElementWithAttributes } from "./helpers.js";
-import { addIcon, deleteIcon, editIcon, editSquareIcon } from "./icons.js";
+import { addIcon, editIcon } from "./icons.js";
+import { getTaskStructure } from "./structures.js";
 
 let tasks = [];
 let editIndex = null;
@@ -19,6 +19,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     addTaskButton.addEventListener("click", addTask);
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            addTask();
+        }
+    });
 
     const recognition = setUpSpeechRecognition();
 
@@ -64,8 +69,8 @@ const addTask = () => {
 const toggleTaskCompleted = (index, target) => {
     tasks[index].isComplete = !tasks[index].isComplete;
 
-    const task = target.parentElement.parentElement;
-    task.classList.toggle("completed");
+    const taskElement = target.parentElement.parentElement;
+    taskElement.classList.toggle("completed");
 
     updateStats();
     saveTasks();
@@ -98,72 +103,23 @@ const updateTaskList = () => {
     taskList.innerHTML = "";
 
     tasks.forEach((task, index) => {
-        const li = createElementWithAttributes("li", {
-            className: `task ${task.isComplete ? "completed" : ""}`,
-        });
-
-        const checkboxContainer = createCheckboxContainer(task, index);
-
-        const actions = createActionsContainer(index);
-
-        li.appendChild(checkboxContainer);
-        li.appendChild(actions);
+        const li = document.createElement("li");
+        li.className = `task ${task.isComplete ? "completed" : ""}`;
+        li.innerHTML = getTaskStructure(task, index);
 
         taskList.appendChild(li);
+
+        const checkbox = li.querySelector(".checkbox");
+        checkbox.addEventListener("change", (e) =>
+            toggleTaskCompleted(index, e.target)
+        );
+
+        const editButton = li.querySelector(".edit");
+        editButton.addEventListener("click", (e) => editTask(index, e.target));
+
+        const deleteButton = li.querySelector(".delete");
+        deleteButton.addEventListener("click", () => deleteTask(index));
     });
-};
-
-const createCheckboxContainer = (task, index) => {
-    const checkboxId = `checkbox-${index}`;
-
-    const checkboxContainer = createElementWithAttributes("div", {
-        className: "checkbox-container",
-    });
-
-    const checkbox = createElementWithAttributes("input", {
-        type: "checkbox",
-        className: "checkbox",
-        id: checkboxId,
-        checked: task.isComplete,
-    });
-
-    checkbox.addEventListener("change", (e) =>
-        toggleTaskCompleted(index, e.target)
-    );
-
-    const label = createElementWithAttributes("label", {
-        htmlFor: checkboxId,
-        textContent: task.text,
-    });
-
-    checkboxContainer.appendChild(checkbox);
-    checkboxContainer.appendChild(label);
-
-    return checkboxContainer;
-};
-
-const createActionsContainer = (index) => {
-    const actions = createElementWithAttributes("div", {
-        className: "actions",
-    });
-
-    const editButton = createElementWithAttributes("button", {
-        innerHTML: editSquareIcon,
-    });
-
-    editButton.addEventListener("click", (e) => editTask(index, e.target));
-
-    const deleteButton = createElementWithAttributes("button", {
-        className: "delete",
-        innerHTML: deleteIcon,
-    });
-
-    deleteButton.addEventListener("click", () => deleteTask(index));
-
-    actions.appendChild(editButton);
-    actions.appendChild(deleteButton);
-
-    return actions;
 };
 
 const updateStats = () => {
@@ -172,7 +128,7 @@ const updateStats = () => {
 
     const totalCompletedTasks = tasks.filter((task) => task.isComplete).length;
     const totalTasks = tasks.length;
-    const completionPercentage = (totalCompletedTasks / totalTasks) * 100;
+    const completionPercentage = (totalCompletedTasks / totalTasks) * 100 || 0;
 
     progress.style.width = `${completionPercentage}%`;
 

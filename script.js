@@ -1,4 +1,4 @@
-import { getTaskStructure } from "./structure.js";
+import { getTaskStructure } from "./structures.js";
 let tasks = [];
 
 const input = document.getElementById("input");

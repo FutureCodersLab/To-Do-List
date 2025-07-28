@@ -23,6 +23,3 @@ export const getTaskStructure = (task, index) => {
         </div>
     `;
 };
-`
-
-`;

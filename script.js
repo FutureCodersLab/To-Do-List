@@ -1,13 +1,14 @@
 import { addIcon, editIcon } from "./icons.js";
 import { getTaskStructure } from "./structures.js";
 
-let tasks = [];
-let editIndex = null;
-
 const input = document.getElementById("input");
-const addTaskButton = document.getElementById("add-task");
+const submitTaskButton = document.getElementById("submit-task");
 const taskList = document.getElementById("task-list");
+const taskSummary = document.getElementById("task-summary");
+const progress = document.getElementById("progress");
 const microphone = document.getElementById("microphone");
+
+let tasks = [];
 
 document.addEventListener("DOMContentLoaded", () => {
     const storedTasks = JSON.parse(localStorage.getItem("tasks"));
@@ -17,13 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
         updateTaskList();
         updateStats();
     }
-
-    addTaskButton.addEventListener("click", addTask);
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-            addTask();
-        }
-    });
 
     const recognition = setUpSpeechRecognition();
 
@@ -41,51 +35,59 @@ document.addEventListener("DOMContentLoaded", () => {
         const speechToText = e.results[0][0].transcript;
         input.value = speechToText;
     });
+
+    submitTaskButton.addEventListener("click", submitTask);
 });
 
-const addTask = () => {
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        submitTask();
+    }
+});
+
+const submitTask = () => {
     const text = input.value.trim();
 
     if (!text) return;
 
-    if (editIndex !== null) {
-        tasks[editIndex].text = text;
-        editIndex = null;
-        Array.from(taskList.children).forEach((task) =>
-            task.classList.remove("editing")
-        );
+    const editingTask = tasks.find((task) => task.isEditing);
+
+    if (editingTask) {
+        editingTask.text = text;
+        editingTask.isEditing = false;
+        submitTaskButton.innerHTML = addIcon;
     } else {
-        tasks.push({ text, isComplete: false });
+        tasks.push({ text, isComplete: false, isEditing: false });
     }
 
-    addTaskButton.innerHTML = addIcon;
     input.value = "";
+    updateTaskList();
+    updateStats();
+    saveTasks();
+};
+
+const toggleTaskCompleted = (index) => {
+    const selectedTask = tasks[index];
+    selectedTask.isComplete = !selectedTask.isComplete;
 
     updateTaskList();
     updateStats();
     saveTasks();
 };
 
-const toggleTaskCompleted = (index, target) => {
-    tasks[index].isComplete = !tasks[index].isComplete;
+const editTask = (index) => {
+    tasks.forEach((task) => {
+        task.isEditing = false;
+    });
 
-    const taskElement = target.parentElement.parentElement;
-    taskElement.classList.toggle("completed");
+    const selectedTask = tasks[index];
+    selectedTask.isEditing = true;
 
-    updateStats();
-    saveTasks();
-};
+    input.value = selectedTask.text;
+    submitTaskButton.innerHTML = editIcon;
 
-const editTask = (index, target) => {
-    Array.from(taskList.children).forEach((task) =>
-        task.classList.remove("editing")
-    );
-
-    const task = target.parentElement.parentElement;
-    task.classList.add("editing");
-    input.value = tasks[index].text;
-    editIndex = index;
-    addTaskButton.innerHTML = editIcon;
+    updateTaskList();
 };
 
 const deleteTask = (index) => {
@@ -104,32 +106,32 @@ const updateTaskList = () => {
 
     tasks.forEach((task, index) => {
         const li = document.createElement("li");
-        li.className = `task ${task.isComplete ? "completed" : ""}`;
+
+        const isCompletedClassName = task.isComplete ? "completed" : "";
+        const isEditingClassName = task.isEditing ? "editing" : "";
+        li.className = `task ${isCompletedClassName} ${isEditingClassName}`;
+
         li.innerHTML = getTaskStructure(task, index);
 
-        taskList.appendChild(li);
-
         const checkbox = li.querySelector(".checkbox");
-        checkbox.addEventListener("change", (e) =>
-            toggleTaskCompleted(index, e.target)
-        );
+        checkbox.addEventListener("change", () => toggleTaskCompleted(index));
 
         const editButton = li.querySelector(".edit");
-        editButton.addEventListener("click", (e) => editTask(index, e.target));
+        editButton.addEventListener("click", () => editTask(index));
 
         const deleteButton = li.querySelector(".delete");
         deleteButton.addEventListener("click", () => deleteTask(index));
+
+        taskList.appendChild(li);
     });
 };
 
 const updateStats = () => {
-    const taskSummary = document.getElementById("task-summary");
-    const progress = document.getElementById("progress");
-
-    const totalCompletedTasks = tasks.filter((task) => task.isComplete).length;
+    const completedTasks = tasks.filter((task) => task.isComplete);
+    const totalCompletedTasks = completedTasks.length;
     const totalTasks = tasks.length;
-    const completionPercentage = (totalCompletedTasks / totalTasks) * 100 || 0;
 
+    const completionPercentage = (totalCompletedTasks / totalTasks) * 100 || 0;
     progress.style.width = `${completionPercentage}%`;
 
     taskSummary.textContent = `${totalCompletedTasks} / ${totalTasks}`;

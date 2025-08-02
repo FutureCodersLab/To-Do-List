@@ -41,12 +41,12 @@ body {
 
 header {
     background-color: var(--blue);
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
     gap: 40px;
-    width: 100%;
     padding: 30px;
 }
 
@@ -67,7 +67,6 @@ header {
     background-color: white;
     display: flex;
     align-items: center;
-    justify-content: center;
     padding: 10px;
     border-radius: 10px;
     font-size: 20px;
@@ -85,7 +84,7 @@ header {
 
 #progress {
     background: var(--progress);
-    width: 0%;
+    width: 0%; /* Change the width to 50% to see the change */
     height: 100%;
     border-radius: 10px;
     transition: 1s ease all;
@@ -94,7 +93,6 @@ header {
 form {
     display: flex;
     justify-content: center;
-    align-items: stretch;
     gap: 20px;
     min-width: 350px;
 }
@@ -119,6 +117,10 @@ form {
     outline: none;
 }
 
+#input.active {
+    animation: gradient-animation 3s linear infinite;
+}
+
 #input::placeholder {
     color: var(--blue);
     opacity: 0.6;
@@ -133,7 +135,7 @@ form {
     cursor: pointer;
 }
 
-#add-task {
+#submit-task {
     all: unset;
     background-color: var(--blue);
     display: flex;
@@ -150,12 +152,12 @@ form {
 }
 
 #task-list {
+    min-width: 350px;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    min-width: 350px;
     list-style: none;
 }
 
@@ -171,12 +173,12 @@ form {
     transition: 0.3s ease border;
 }
 
-.task.completed label {
-    text-decoration: line-through;
-}
-
 .task.editing {
     border: 2px solid var(--blue);
+}
+
+.task.completed label {
+    text-decoration: line-through;
 }
 
 .checkbox-container {
@@ -234,8 +236,4 @@ form {
     100% {
         border-image-source: var(--gradient-animation-100);
     }
-}
-
-#input.active {
-    animation: gradient-animation 3s linear infinite;
 }

@@ -7,7 +7,7 @@ export const getTaskStructure = (task, index) => {
                 id="checkbox-${index}"
                 ${task.isComplete ? "checked" : ""}
             />
-            <label htmlFor="checkbox-${index}">${task.text}</label>
+            <label for="checkbox-${index}">${task.text}</label>
         </div>
         <div class="actions">
             <button class="edit">
@@ -15,6 +15,7 @@ export const getTaskStructure = (task, index) => {
                     edit_square
                 </span>
             </button>
+
             <button class="delete">
                 <span class="material-symbols-rounded task-icon">
                     delete

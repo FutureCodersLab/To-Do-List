@@ -1,23 +1,24 @@
 import { getTaskStructure } from "./structures.js";
 
 const input = document.getElementById("input");
-const submitTaskButton = document.getElementById("submit-task");
+const form = document.querySelector("form");
 const taskList = document.getElementById("task-list");
 
 let tasks = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-    submitTaskButton.addEventListener("click", submitTask);
+    form.addEventListener("submit", submitTask);
 });
 
-const submitTask = () => {
+const submitTask = (e) => {
+    e.preventDefault();
     const text = input.value.trim();
 
     if (!text) return;
 
     tasks.push({ text, isComplete: false });
 
-    input.value = "";
+    form.reset();
     updateTaskList();
 };
 

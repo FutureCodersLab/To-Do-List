@@ -1,8 +1,8 @@
 import { getTaskStructure } from "./structures.js";
 
-const input = document.getElementById("input");
+const input = document.querySelector("input");
 const form = document.querySelector("form");
-const taskList = document.getElementById("task-list");
+const taskListContainer = document.getElementById("task-list");
 
 let tasks = [];
 
@@ -16,22 +16,22 @@ const submitTask = (e) => {
 
     if (!text) return;
 
-    tasks.push({ text, isComplete: false });
+    tasks.push({ text, completed: false });
 
     form.reset();
     updateTaskList();
 };
 
 const updateTaskList = () => {
-    taskList.innerHTML = "";
+    taskListContainer.innerHTML = "";
 
     tasks.forEach((task, index) => {
         const li = document.createElement("li");
 
-        const isCompletedClassName = task.isComplete ? "completed" : "";
-        li.className = `task ${isCompletedClassName}`;
+        const completedClass = task.completed ? "completed" : "";
+        li.className = `task ${completedClass}`;
 
         li.innerHTML = getTaskStructure(task, index);
-        taskList.appendChild(li);
+        taskListContainer.appendChild(li);
     });
 };

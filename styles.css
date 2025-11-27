@@ -105,7 +105,7 @@ form {
     width: 100%;
 }
 
-#input {
+input {
     background-color: white;
     flex: 1;
     padding: 16px;
@@ -117,7 +117,7 @@ form {
     outline: none;
 }
 
-#input::placeholder {
+input::placeholder {
     color: var(--blue);
     opacity: 0.6;
 }
@@ -169,19 +169,19 @@ form {
     transition: 0.3s ease border;
 }
 
-.checkbox-container {
+.checkbox-group {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.checkbox-container input {
+.checkbox-group input {
     width: 20px;
     height: 20px;
     cursor: pointer;
 }
 
-.checkbox-container label {
+.checkbox-group label {
     user-select: none;
     cursor: pointer;
 }

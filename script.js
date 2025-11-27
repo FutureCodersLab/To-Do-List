@@ -1,10 +1,11 @@
 import { addIcon, editIcon } from "./icons.js";
 import { getTaskStructure } from "./structures.js";
 
-const input = document.getElementById("input");
+const input = document.querySelector("input");
 const form = document.querySelector("form");
-const taskList = document.getElementById("task-list");
+const taskListContainer = document.getElementById("task-list");
 const taskSummary = document.getElementById("task-summary");
+const submitTaskButton = document.getElementById("submit-task");
 const progress = document.getElementById("progress");
 const microphone = document.getElementById("microphone");
 
@@ -45,14 +46,14 @@ const submitTask = (e) => {
 
     if (!text) return;
 
-    const editingTask = tasks.find((task) => task.isEditing);
+    const editingTask = tasks.find((task) => task.editing);
 
     if (editingTask) {
         editingTask.text = text;
-        editingTask.isEditing = false;
+        editingTask.editing = false;
         submitTaskButton.innerHTML = addIcon;
     } else {
-        tasks.push({ text, isComplete: false, isEditing: false });
+        tasks.push({ text, completed: false, editing: false });
     }
 
     form.reset();
@@ -63,7 +64,7 @@ const submitTask = (e) => {
 
 const toggleTaskCompleted = (index) => {
     const selectedTask = tasks[index];
-    selectedTask.isComplete = !selectedTask.isComplete;
+    selectedTask.completed = !selectedTask.completed;
 
     updateTaskList();
     updateStats();
@@ -72,11 +73,11 @@ const toggleTaskCompleted = (index) => {
 
 const editTask = (index) => {
     tasks.forEach((task) => {
-        task.isEditing = false;
+        task.editing = false;
     });
 
     const selectedTask = tasks[index];
-    selectedTask.isEditing = true;
+    selectedTask.editing = true;
 
     input.value = selectedTask.text;
     submitTaskButton.innerHTML = editIcon;
@@ -96,14 +97,14 @@ const saveTasks = () => {
 };
 
 const updateTaskList = () => {
-    taskList.innerHTML = "";
+    taskListContainer.innerHTML = "";
 
     tasks.forEach((task, index) => {
         const li = document.createElement("li");
 
-        const isCompletedClassName = task.isComplete ? "completed" : "";
-        const isEditingClassName = task.isEditing ? "editing" : "";
-        li.className = `task ${isCompletedClassName} ${isEditingClassName}`;
+        const completedClass = task.completed ? "completed" : "";
+        const editingClass = task.editing ? "editing" : "";
+        li.className = `task ${completedClass} ${editingClass}`;
 
         li.innerHTML = getTaskStructure(task, index);
 
@@ -116,12 +117,12 @@ const updateTaskList = () => {
         const deleteButton = li.querySelector(".delete");
         deleteButton.addEventListener("click", () => deleteTask(index));
 
-        taskList.appendChild(li);
+        taskListContainer.appendChild(li);
     });
 };
 
 const updateStats = () => {
-    const completedTasks = tasks.filter((task) => task.isComplete);
+    const completedTasks = tasks.filter((task) => task.completed);
     const totalCompletedTasks = completedTasks.length;
     const totalTasks = tasks.length;
 

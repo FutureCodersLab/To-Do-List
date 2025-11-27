@@ -1,6 +1,6 @@
 export const getTaskStructure = (task, index) => {
     return `
-        <div class="checkbox-container">
+        <div class="checkbox-group">
             <input
                 type="checkbox"
                 class="checkbox"

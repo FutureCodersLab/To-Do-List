@@ -5,6 +5,7 @@ const form = document.querySelector("form");
 const taskListContainer = document.getElementById("task-list");
 
 let tasks = [];
+// {text: "do homework", completed: false}
 
 document.addEventListener("DOMContentLoaded", () => {
     form.addEventListener("submit", submitTask);

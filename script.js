@@ -5,9 +5,9 @@ const input = document.querySelector("input");
 const form = document.querySelector("form");
 const taskListContainer = document.getElementById("task-list");
 const taskSummary = document.getElementById("task-summary");
-const submitTaskButton = document.getElementById("submit-task");
 const progress = document.getElementById("progress");
 const microphone = document.getElementById("microphone");
+const submitTaskButton = document.getElementById("submit-task");
 
 let tasks = [];
 
